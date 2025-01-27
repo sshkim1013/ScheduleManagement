@@ -108,7 +108,24 @@ public class ScheduleController {
 
     //일정 삭제 메서드
     @DeleteMapping("/{id}")
-    public void deleteSchedule(@PathVariable Long id) {
-        scheduleList.remove(id);
+    public ResponseEntity<ScheduleResponseDto> deleteSchedule(
+            @PathVariable Long id,
+            @RequestBody ScheduleRequestDto dto
+    ) {
+        Schedule schedule = scheduleList.get(id);
+
+        if (dto.getTask() != null || dto.getCreateDate() != null ||
+                dto.getAuthorName() != null || dto.getModifiedDate() != null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        //비밀번호 검증 로직
+        if (dto.getPassword().equals(schedule.getPassword())) {
+            scheduleList.remove(id);
+        } else {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

@@ -48,5 +48,4 @@ public class Schedule {
         this.password = dto.getPassword();
         this.modifiedDate = LocalDateTime.now();
     }
-
 }
