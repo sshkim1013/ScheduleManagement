@@ -10,8 +10,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ScheduleServiceImpl implements ScheduleService {
@@ -32,30 +34,41 @@ public class ScheduleServiceImpl implements ScheduleService {
 
 
     @Override
-    public List<ScheduleResponseDto> findAllSchedules(String authorName, String modifiedDate) {
+    public List<ScheduleResponseDto> findAllSchedules(String authorName, String modifiedDate, Map<String, String> queryParams) {
+        if (!queryParams.keySet().stream().allMatch(param -> param.equals("authorName") || param.equals("modifiedDate"))) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid parameter included in the request.");
+        }
+
         List<ScheduleResponseDto> scheduleResponseList = new ArrayList<>();
         LocalDate parsedDate = null;
 
         if (modifiedDate != null && !modifiedDate.isEmpty()) {
-            parsedDate = LocalDate.parse(modifiedDate, DateTimeFormatter.ISO_DATE);
+            try {
+                parsedDate = LocalDate.parse(modifiedDate, DateTimeFormatter.ISO_DATE);
+            } catch (DateTimeParseException e) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid date format. Please use 'yyyy-MM-dd'.");
+            }
         }
 
+        //전체 조회: 파라미터가 없는 경우
         if (authorName == null && modifiedDate == null) {
             for (Schedule schedule : scheduleRepository.findAllSchedules()) {
                 scheduleResponseList.add(new ScheduleResponseDto(schedule));
             }
+
         } else {
             for (Schedule schedule : scheduleRepository.findAllSchedules()) {
-                boolean aBool = authorName != null && authorName.equals(schedule.getAuthorName());
-                boolean dBool = parsedDate != null && parsedDate.equals(schedule.getModifiedDate().toLocalDate());
+                boolean matchesAuthor = (authorName != null) && authorName.equals(schedule.getAuthorName());
+                boolean matchesDate = (parsedDate != null) && parsedDate.equals(schedule.getModifiedDate().toLocalDate());
 
-                if (aBool || dBool) {
+                if ((matchesAuthor && matchesDate) ||
+                        (matchesAuthor && modifiedDate == null) ||
+                                (matchesDate && authorName == null)) {
                     scheduleResponseList.add(new ScheduleResponseDto(schedule));
                 }
             }
         }
 
-        //수정일의 내림차순으로 정렬
         scheduleResponseList.sort((s1, s2)
                                         -> s2.getModifiedDate().compareTo(s1.getModifiedDate()));
 
