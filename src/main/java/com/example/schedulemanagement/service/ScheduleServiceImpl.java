@@ -121,7 +121,12 @@ public class ScheduleServiceImpl implements ScheduleService {
         }
 
         if (password.equals(optionalSchedule.get().getPassword())) {
-            scheduleRepository.deleteSchedule(id);
+            int deletedRow = scheduleRepository.deleteSchedule(id);
+
+            if (deletedRow == 0) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id = " + id);
+            }
+
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You're typing wrong password!");
         }

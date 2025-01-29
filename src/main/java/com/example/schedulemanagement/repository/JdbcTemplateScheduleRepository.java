@@ -63,14 +63,14 @@ public class JdbcTemplateScheduleRepository implements ScheduleRepository {
     @Override
     public int updateSchedule(Long id, String task, String authorName) {
         return jdbcTemplate.update(
-                "UPDATE schedule SET task = ?, authorName = ?, modifiedDate = NOW() WHERE id = ?",
+                "update schedule set task = ?, authorName = ?, modifiedDate = NOW() where id = ?",
                 task, authorName, id);
     }
 
 
     @Override
-    public void deleteSchedule(Long id) {
-
+    public int deleteSchedule(Long id) {
+        return jdbcTemplate.update("delete from schedule where id = ?", id);
     }
 
 
