@@ -6,6 +6,7 @@ import com.example.schedulemanagement.entity.Schedule;
 import com.example.schedulemanagement.repository.ScheduleRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
@@ -14,6 +15,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class ScheduleServiceImpl implements ScheduleService {
@@ -28,8 +30,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     public ScheduleResponseDto saveSchedule(ScheduleRequestDto dto) {
         Schedule schedule = new Schedule(dto.getTask(), dto.getAuthorName(), dto.getPassword());
-        Schedule savedSchedule = scheduleRepository.saveSchedule(schedule);
-        return new ScheduleResponseDto(savedSchedule);
+        return scheduleRepository.saveSchedule(schedule);
     }
 
 
@@ -52,25 +53,22 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         //전체 조회: 파라미터가 없는 경우
         if (authorName == null && modifiedDate == null) {
-            for (Schedule schedule : scheduleRepository.findAllSchedules()) {
-                scheduleResponseList.add(new ScheduleResponseDto(schedule));
+            for (ScheduleResponseDto schedule : scheduleRepository.findAllSchedules()) {
+                scheduleResponseList.add(schedule);
             }
 
         } else {
-            for (Schedule schedule : scheduleRepository.findAllSchedules()) {
+            for (ScheduleResponseDto schedule : scheduleRepository.findAllSchedules()) {
                 boolean matchesAuthor = (authorName != null) && authorName.equals(schedule.getAuthorName());
                 boolean matchesDate = (parsedDate != null) && parsedDate.equals(schedule.getModifiedDate().toLocalDate());
 
                 if ((matchesAuthor && matchesDate) ||
                         (matchesAuthor && modifiedDate == null) ||
                                 (matchesDate && authorName == null)) {
-                    scheduleResponseList.add(new ScheduleResponseDto(schedule));
+                    scheduleResponseList.add(schedule);
                 }
             }
         }
-
-        scheduleResponseList.sort((s1, s2)
-                                        -> s2.getModifiedDate().compareTo(s1.getModifiedDate()));
 
         return scheduleResponseList;
     }
@@ -78,19 +76,21 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public ScheduleResponseDto findScheduleById(Long id) {
-        if (scheduleRepository.findScheduleById(id) == null) {
+        Optional<Schedule> optionalSchedule = scheduleRepository.findScheduleById(id);
+
+        if (optionalSchedule.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id = " + id);
         }
 
-        return new ScheduleResponseDto(scheduleRepository.findScheduleById(id));
+        return new ScheduleResponseDto(optionalSchedule.get());
     }
 
-
+    @Transactional
     @Override
     public ScheduleResponseDto updateSchedule(Long id, String task, String authorName, String password) {
-        Schedule schedule = scheduleRepository.findScheduleById(id);
+        Optional<Schedule> schedule = scheduleRepository.findScheduleById(id);
 
-        if (schedule == null) {
+        if (schedule.get() == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id = " + id);
         }
 
@@ -98,30 +98,34 @@ public class ScheduleServiceImpl implements ScheduleService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The task and authorName are required values!");
         }
 
-        if (password.equals(schedule.getPassword())) {
-            schedule.update(task, authorName, password);
-        } else {
+        // 저장된 password와 입력한 password 비교
+        if (!password.equals(schedule.get().getPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You're typing wrong password!");
         }
 
-        return new ScheduleResponseDto(schedule);
+        int updatedRow = scheduleRepository.updateSchedule(id, task, authorName);
+        if (updatedRow == 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id = " + id);
+        } else {
+            return new ScheduleResponseDto(schedule.get());
+        }
     }
 
 
     @Override
     public ScheduleResponseDto deleteSchedule(Long id, String password) {
-        Schedule schedule = scheduleRepository.findScheduleById(id);
+        Optional<Schedule> optionalSchedule = scheduleRepository.findScheduleById(id);
 
-        if (schedule == null) {
+        if (optionalSchedule.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id = " + id);
         }
 
-        if (password.equals(schedule.getPassword())) {
+        if (password.equals(optionalSchedule.get().getPassword())) {
             scheduleRepository.deleteSchedule(id);
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You're typing wrong password!");
         }
 
-        return new ScheduleResponseDto(schedule);
+        return new ScheduleResponseDto(optionalSchedule.get());
     }
 }

@@ -2,6 +2,7 @@ package com.example.schedulemanagement.service;
 
 import com.example.schedulemanagement.dto.ScheduleRequestDto;
 import com.example.schedulemanagement.dto.ScheduleResponseDto;
+import com.example.schedulemanagement.entity.Schedule;
 
 import java.util.List;
 import java.util.Map;

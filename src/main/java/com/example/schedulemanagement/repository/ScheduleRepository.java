@@ -1,12 +1,15 @@
 package com.example.schedulemanagement.repository;
 
+import com.example.schedulemanagement.dto.ScheduleResponseDto;
 import com.example.schedulemanagement.entity.Schedule;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ScheduleRepository {
-    Schedule saveSchedule(Schedule schedule);
-    List<Schedule> findAllSchedules();
-    Schedule findScheduleById(Long id);
+    ScheduleResponseDto saveSchedule(Schedule schedule);
+    List<ScheduleResponseDto> findAllSchedules();
+    Optional<Schedule> findScheduleById(Long id);
+    int updateSchedule(Long id, String task, String authorName);
     void deleteSchedule(Long id);
 }

@@ -2,7 +2,6 @@ package com.example.schedulemanagement.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -10,9 +9,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Schedule {
 
-    @Setter
     private Long id;
-
     private String task;
     private String authorName;
     private String password;
@@ -38,10 +35,12 @@ public class Schedule {
     }
 
 
-    public void update(String task, String authorName, String password) {
+    public Schedule update(String task, String authorName, String password) {
         this.task = task;
         this.authorName = authorName;
         this.password = password;
         this.modifiedDate = LocalDateTime.now();
+
+        return this;
     }
 }
