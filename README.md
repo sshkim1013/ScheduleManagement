@@ -11,7 +11,8 @@
 <br>
 
 - **ERD**
-  - ㄴㅁㄹㄴㄹㄴㄹ
+<img width="266" alt="스크린샷 2025-01-30 오후 5 20 18" src="https://github.com/user-attachments/assets/d4478eb1-c074-43bf-971c-714a9137481d" />
+
 
 <br>
   
