@@ -33,14 +33,4 @@ public class Schedule {
         this.createDate = LocalDateTime.now();
         this.modifiedDate = LocalDateTime.now();
     }
-
-
-    public Schedule update(String task, String authorName, String password) {
-        this.task = task;
-        this.authorName = authorName;
-        this.password = password;
-        this.modifiedDate = LocalDateTime.now();
-
-        return this;
-    }
 }
