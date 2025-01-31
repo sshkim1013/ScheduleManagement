@@ -4,11 +4,25 @@
 **[ Level 0 ]**
   
 - **API 명세서** 
+
+|   Description   |   Mapping Type   |   REST API   |    Request   |  Response  |  StatusCode  |
+|-----------------|------------|------------------|-------------------------------------|------------------------------------|--------------|
+|    일정 생성      |    POST    |  /schedule  |  { <br/> &nbsp;&nbsp;“task : ”일정 생성1”, &nbsp;&nbsp;“authorName” : ”이름1”, &nbsp;&nbsp;“password” : ”12345” <br/> } | { <br/> &nbsp;&nbsp;“id” : 1, <br/> &nbsp;&nbsp;“task” : ”일정 생성1”, &nbsp;&nbsp;“authorName” : ”이름1”, &nbsp;&nbsp;“password” : ”12345”, &nbsp;&nbsp;“createDate” : 2025-01-29T15:13:05, &nbsp;&nbsp;"modifiedDate” : 2025-01-29T15:13:05 <br/> } | 201 Created |
+|  일정 전체 조회  |    GET    |  /schedules <br/><br/> /schedules?authorName={authorName} <br/><br/> /schedules?modifiedDate={modifiedDate} <br/><br/> /schedules?authorName={authorName}&modifiedDate={modifiedDate}  |  /schedules <br/><br/> /schedules?authorName=이름1 <br/><br/> /schedules?modifiedDate=2025-01-29 <br/><br/> /schedules?authorName=이름1&modifiedDate=2025-01-29 | [<br/>&nbsp;&nbsp;{<br/>&nbsp;&nbsp;&nbsp;&nbsp;“id” : 2,<br/>&nbsp;&nbsp;&nbsp;&nbsp;“task” : ”일정 생성2”, &nbsp;&nbsp;&nbsp;&nbsp;“authorName” : ”이름2”, &nbsp;&nbsp;&nbsp;&nbsp;“password” : ”1234567”, &nbsp;&nbsp;&nbsp;&nbsp;“createDate” : 2025-01-29T15:15:17, &nbsp;&nbsp;&nbsp;&nbsp;“modifiedDate” : 2025-01-29T15:15:17<br/>&nbsp;&nbsp;},<br/>&nbsp;&nbsp;{<br/>&nbsp;&nbsp;&nbsp;&nbsp;“id” : 1, <br/>&nbsp;&nbsp;&nbsp;&nbsp;“task” : ”일정 생성1”, &nbsp;&nbsp;&nbsp;&nbsp;“authorName” : ”이름1”, &nbsp;&nbsp;&nbsp;&nbsp;“password” : ”12345”, &nbsp;&nbsp;&nbsp;&nbsp;“createDate” : 2025-01-29T15:13:05, &nbsp;&nbsp;&nbsp;&nbsp;“modifiedDate” : 2025-01-29T15:13:05<br/>&nbsp;&nbsp;}<br/>] | 200 OK |
+|  일정 단일 조회  |    GET    |  /schedules/{id}  |  /schedules/2  | {<br/>&nbsp;&nbsp;“id” : 2,<br/> &nbsp;&nbsp;“task : ”일정 생성2”, <br/> &nbsp;&nbsp;“authorName” : ”이름2”, <br/> &nbsp;&nbsp;“password” : ”1234567”,<br/> &nbsp;&nbsp;“createDate” : 2025-01-29T15:15:17,<br/> &nbsp;&nbsp;“modifiedDate”:2025-01-29T15:15:17<br/>} | 200 OK  |
+| 일정 수정 |  PUT  |  /schedule/{id}  |  /schedules/1<br/>{<br/> &nbsp;&nbsp;“task” : ”수정된 일정”,<br/> &nbsp;&nbsp;“authorName” : ”수정된 이름”,<br/> &nbsp;&nbsp;“password” : ”12345”<br/>}  | {<br/>&nbsp;&nbsp;“id” : 2,<br/>&nbsp;&nbsp;“task” : ”수정된 일정”,<br/>&nbsp;&nbsp;“authorName” : ”수정된 이름”,<br/> &nbsp;&nbsp;“password” : ”12345”,<br/> &nbsp;&nbsp;“createDate” : 2025-01-29T15:15:17,<br/> &nbsp;&nbsp;“modifiedDate” : 2025-01-29T15:27:13<br/>}  |  200 OK  |
+| 일정 삭제 | DELETE |  /schedules/{id}  |  {<br/>&nbsp;&nbsp;“password” : ”12345”<br/>}  | - |200 OK  |
+
+<br>
+
+### 가독성이 떨어질 것이 우려되어 사진도 함께 첨부합니다 :)
+
+<br>
+
 <img width="1104" alt="스크린샷 2025-01-30 오후 3 34 07" src="https://github.com/user-attachments/assets/3eebbb8a-514e-437a-830b-0234b57b63d2" />
 <img width="1095" alt="스크린샷 2025-01-30 오후 3 34 28" src="https://github.com/user-attachments/assets/c7663713-5a4c-40a7-8f55-738644ae51b3" />
 
-<br>
-<br>
+<br><br>
 
 - **ERD**
 <img width="266" alt="스크린샷 2025-01-30 오후 5 20 18" src="https://github.com/user-attachments/assets/d4478eb1-c074-43bf-971c-714a9137481d" />
